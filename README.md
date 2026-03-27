@@ -21,6 +21,6 @@ This project was created to practice:
 - [ ] stdin support
 - [ ] different encoding support
 - [ ] add -n flag for configurable minimum length
-- [ ] print byte offset of strings
-- [ ] print length of strings
+- [x] print byte offset of strings
+- [x] print length of strings
 - [ ] print size of strings
