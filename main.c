@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <ctype.h>
 
 #define BUFFER_SIZE 4096
@@ -11,13 +12,24 @@ void find_and_print_strings(FILE* fp, size_t n)
     char temp_str[BUFFER_SIZE];
     size_t current_pos = 0; 
     size_t bytes_read = 0;
+    size_t string_offset = 0x0;
+    size_t file_offset = 0x0;
+    bool new_string = false;
 
+
+    printf("  offset     len    string\n");
+    printf("--------------------------\n");
     while ((bytes_read = fread(read_buffer, 1, BUFFER_SIZE, fp)) > 0)
     { 
         for (size_t i = 0; i < bytes_read; i++)
         {
             if (isprint(read_buffer[i]))
             {
+                if (!new_string)
+                {
+                    string_offset = file_offset;
+                    new_string = true;
+                }
                 temp_str[current_pos++] = read_buffer[i];
             }
             else
@@ -25,19 +37,21 @@ void find_and_print_strings(FILE* fp, size_t n)
                 if (current_pos >= n)
                 {
                     temp_str[current_pos] = '\0';
-                    printf("Find: %s\n", temp_str);
+                    printf("0x%08zx    %-2zu      %s\n", string_offset, current_pos, temp_str);
                 }
-
+                new_string = false;
                 current_pos = 0;
             }
+            file_offset++;
         }
     }
 
     // if last character is printable -- not EOF
     if (current_pos >= n)
     {
-        temp_str[current_pos] = '\0';
-        printf("Find: %s\n", temp_str);
+
+        temp_str[current_pos] = '\0'; 
+        printf("0x%08zx    %-2zu      %s\n", string_offset, current_pos, temp_str);
     }
 }
 
